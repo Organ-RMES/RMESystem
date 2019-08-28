@@ -7,7 +7,7 @@ namespace RMES.Test
         static void Main(string[] args)
         {
 
-            Console.WriteLine("提交吧2355");
+            Console.WriteLine("提交吧666");
             Console.WriteLine("Hello World!");
         }
     }
