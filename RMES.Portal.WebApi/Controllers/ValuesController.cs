@@ -11,8 +11,13 @@ namespace RMES.Portal.WebApi.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
-        [HttpGet]
-        public string[] GetValues()
+        /// <summary>
+        /// 测试的方法
+        /// </summary>
+        /// <param name="id">测试的参数，没啥用</param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public string[] GetValues(int id)
         {
             return new[] { "value1", "value2" };
         }
