@@ -15,6 +15,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.OpenApi.Models;
 using RMES.Portal.WebApi.Extensions.Filters;
 using RMES.Portal.WebApi.Extensions.Middlewares;
 
@@ -33,6 +34,12 @@ namespace RMES.Portal.WebApi
         {
             // 使用Autofac创建Conroller
             services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
+
+            // 注册Swagger
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "RMES Portal", Version = "v1" });
+            });
 
             services.AddControllers(options => 
             {
@@ -67,6 +74,14 @@ namespace RMES.Portal.WebApi
             app.UseRouting();
 
             app.UseAuthorization();
+
+            app.UseSwagger();
+
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "RMES Portal V1");
+                c.RoutePrefix = string.Empty; // 不使用Swagger前缀
+            });
 
             app.UseEndpoints(endpoints =>
             {

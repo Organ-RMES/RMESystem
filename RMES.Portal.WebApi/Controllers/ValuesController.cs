@@ -2,18 +2,19 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace RMES.Portal.WebApi.Controllers
 {
-    [Route("Test")]
-    public class TestController : Controller
+    [Route("api/[controller]")]
+    [ApiController]
+    public class ValuesController : ControllerBase
     {
         [HttpGet]
-        public IActionResult Index()
+        public string[] GetValues()
         {
-            throw new Exception("MVC异常");
-            return View();
+            return new[] { "value1", "value2" };
         }
     }
 }
