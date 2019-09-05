@@ -5,11 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.2.6" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <ProjectReference Include="..\RMES.EF\RMES.EF.csproj" />
     <ProjectReference Include="..\RMES.Entity\RMES.Entity.csproj" />
+    <ProjectReference Include="..\RMES.Framework\RMES.Framework.csproj" />
+    <ProjectReference Include="..\RMES.Services.Common\RMES.Services.Common.csproj" />
   </ItemGroup>
 
 </Project>

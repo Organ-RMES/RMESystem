@@ -1,24 +1,23 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 using Autofac;
 using Autofac.Extras.DynamicProxy;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using RMES.EF;
 using RMES.Portal.WebApi.Extensions.Filters;
 using RMES.Portal.WebApi.Extensions.Middlewares;
+using System;
+using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace RMES.Portal.WebApi
 {
@@ -43,6 +42,12 @@ namespace RMES.Portal.WebApi
                 var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
+            });
+
+            services.AddDbContext<RmesContext>(options =>
+            {
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"));
+                options.EnableSensitiveDataLogging(true);
             });
 
             services.AddControllers(options => 
@@ -73,7 +78,7 @@ namespace RMES.Portal.WebApi
 
             app.UseMiddleware<GlobalExceptionHandler>();
 
-            app.UseHttpsRedirection();
+            //app.UseHttpsRedirection();
 
             app.UseRouting();
 
@@ -90,6 +95,7 @@ namespace RMES.Portal.WebApi
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapControllers();
+                endpoints.MapAreaControllerRoute("areas", "areas", "{area:exists}/{controller}/{id?}");
             });
         }
     }

@@ -27,4 +27,14 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Areas\Bbs\Data\" />
+    <Folder Include="Areas\Bbs\Models\" />
+    <Folder Include="Areas\Bbs\Views\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RMES.Services.Bbs\RMES.Services.Bbs.csproj" />
+  </ItemGroup>
+
 </Project>
