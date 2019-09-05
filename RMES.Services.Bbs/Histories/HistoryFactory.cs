@@ -5,7 +5,7 @@ namespace RMES.Services.Bbs
     /// <summary>
     /// 操作记录帮助类，返回操作记录实体
     /// </summary>
-    public class HistoryUtil
+    public class HistoryFactory
     {
         public static History Visit(int topicId, string title, int userId)
         {

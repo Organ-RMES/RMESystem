@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using RMES.EF;
 using RMES.Framework;
 using RMES.Portal.WebApi.Extensions;
 using RMES.Services.Bbs;
+using System.Threading.Tasks;
 
 namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
 {
@@ -22,23 +18,6 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         public PostsController(RmesContext context)
         {
             _service = new PostService(context);
-        }
-
-        [HttpGet]
-        public IEnumerable<string> Get()
-        {
-            return new string[] { "value1", "value2" };
-        }
-
-        /// <summary>
-        /// 获取一篇帖子
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        [HttpGet("{id}", Name = "Get")]
-        public async Task<Result> Get(int id)
-        {
-            return await Task.FromResult(ResultUtil.Ok());
         }
 
         /// <summary>
@@ -89,11 +68,11 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return await _service.Reply(id, reply.TargetUserId, reply.Contents, _user);
         }
 
-        [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
-        {
-        }
-
+        /// <summary>
+        /// 删除帖子
+        /// </summary>
+        /// <param name="id">帖子ID</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<Result> Delete(int id)
         {

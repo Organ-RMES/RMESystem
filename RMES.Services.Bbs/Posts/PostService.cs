@@ -128,14 +128,14 @@ namespace RMES.Services.Bbs
                 {
                     log.Value = 0;
                     post.LikeCount -= 1;
-                    history = HistoryUtil.UndoLike(post.TopicId, post.Id, "", user.Id);
+                    history = HistoryFactory.UndoLike(post.TopicId, post.Id, "", user.Id);
                     _context.Add(history);
                 }
                 else
                 {
                     log.Value = 1;
                     post.LikeCount += 1;
-                    history = HistoryUtil.Like(post.TopicId, post.Id, "", user.Id);
+                    history = HistoryFactory.Like(post.TopicId, post.Id, "", user.Id);
                     _context.Add(history);
                 }
             }
@@ -151,7 +151,7 @@ namespace RMES.Services.Bbs
                 };
                 _context.LikeLogs.Add(log);
                 post.LikeCount += 1;
-                history = HistoryUtil.Like(post.TopicId, post.Id, "", user.Id);
+                history = HistoryFactory.Like(post.TopicId, post.Id, "", user.Id);
                 _context.Add(history);
             }
 
@@ -191,14 +191,14 @@ namespace RMES.Services.Bbs
                 {
                     log.Value = 0;
                     post.DislikeCount -= 1;
-                    history = HistoryUtil.UndoDislike(post.TopicId, post.Id, "", user.Id);
+                    history = HistoryFactory.UndoDislike(post.TopicId, post.Id, "", user.Id);
                     _context.Add(history);
                 }
                 else
                 {
                     log.Value = 2;
                     post.DislikeCount += 1;
-                    history = HistoryUtil.Dislike(post.TopicId, post.Id, "", user.Id);
+                    history = HistoryFactory.Dislike(post.TopicId, post.Id, "", user.Id);
                     _context.Add(history);
                 }
             }
@@ -214,7 +214,7 @@ namespace RMES.Services.Bbs
                 };
                 post.DislikeCount += 1;
                 _context.LikeLogs.Add(log);
-                history = HistoryUtil.Dislike(post.TopicId, post.Id, "", user.Id);
+                history = HistoryFactory.Dislike(post.TopicId, post.Id, "", user.Id);
                 _context.Add(history);
             }
 
@@ -247,7 +247,7 @@ namespace RMES.Services.Bbs
                 CreateBy = user.Id
             };
 
-            var history = HistoryUtil.Reply(post.TopicId, post.Id, targetUserId, "", contents, user.Id);
+            var history = HistoryFactory.Reply(post.TopicId, post.Id, targetUserId, "", contents, user.Id);
             post.ReplyCount += 1;
             _context.Replies.Add(reply);
             _context.Histories.Add(history);

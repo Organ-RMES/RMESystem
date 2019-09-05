@@ -3,7 +3,7 @@
 namespace RMES.Services.Bbs
 {
     /// <summary>
-    /// 主题视图
+    /// 主题列表视图
     /// </summary>
     public class TopicListView
     {

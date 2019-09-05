@@ -25,14 +25,26 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             _topicService = new TopicService(context);
         }
 
-        // GET: api/Topics
+        /// <summary>
+        /// 获取主题列表
+        /// </summary>
+        /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Topic>>> GetTopics()
+        public async Task<ActionResult<IEnumerable<Topic>>> GetTopics([FromQuery]TopicSearchInput input, int pageIndex, int pageSize = 20)
         {
-            return await _context.Topics.ToListAsync();
+            pageIndex = pageIndex < 1 ? 1 : pageIndex;
+            pageSize = pageSize < 5 ? 5 : pageSize;
+
+            var where = input.ToExpression();
+
+            return await _context.Topics.Where(where).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
         }
 
-        // GET: api/Topics/5
+        /// <summary>
+        /// 获取主题详情视图，包含所有的帖子
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<Result> GetTopic(int id)
         {
@@ -40,7 +52,12 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return result;
         }
 
-        // PUT: api/Topics/5
+        /// <summary>
+        /// 更新主题
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="topic"></param>
+        /// <returns></returns>
         [HttpPut("{id}")]
         public async Task<IActionResult> PutTopic(int id, Topic topic)
         {
@@ -70,16 +87,39 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return NoContent();
         }
 
-        // POST: api/Topics
+        /// <summary>
+        /// 发布主题
+        /// </summary>
+        /// <param name="topic"></param>
+        /// <returns></returns>
         [HttpPost]
         public async Task<Result> PostTopic(TopicCreateDto topic)
         {
-            var result = await _topicService.Create(topic, _user);
+            if (!TryValidateModel(topic))
+            {
+                var errors = new List<string>();
+                if (!TryValidateModel(topic))
+                {
+                    foreach (var value in ModelState.Values)
+                    {
+                        foreach (var error in value.Errors)
+                        {
+                            errors.Add(error.ErrorMessage);
+                        }
+                    }
+                }
 
+                return ResultUtil.BadRequest(string.Join(";", errors));
+            }
+            var result = await _topicService.Create(topic, _user);
             return result;
         }
 
-        // DELETE: api/Topics/5
+        /// <summary>
+        /// 删除主题
+        /// </summary>
+        /// <param name="id">主题ID</param>
+        /// <returns></returns>
         [HttpDelete("{id}")]
         public async Task<Result> DeleteTopic(int id)
         {
