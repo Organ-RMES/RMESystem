@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AutoMapper;
+using RMES.Portal.WebApi.Extensions.Authorizations;
 using RMES.Services.Bbs;
 
 namespace RMES.Portal.WebApi
@@ -48,8 +49,16 @@ namespace RMES.Portal.WebApi
 
             // ×¢²áAutoMapper
             services.AddAutoMapper(typeof(BbsAutoMapperProfile).Assembly);
+
+            // ×¢²á×Ô¶¨ÒåService
             services.AddTransient<TopicService>();
             services.AddTransient<PostService>();
+
+            // ×¢²áJWT
+            services.AddJwtConfiguration(Configuration);
+
+            // ×¢²á»º´æ
+            services.AddDistributedMemoryCache();
 
             services.AddDbContext<RmesContext>(options =>
             {
@@ -88,6 +97,8 @@ namespace RMES.Portal.WebApi
             //app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseAuthentication();
 
             app.UseAuthorization();
 

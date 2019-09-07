@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Threading;
+using RMES.Util;
 
 namespace RMES.Test
 {
@@ -6,9 +8,18 @@ namespace RMES.Test
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("123!");
-            Console.WriteLine("提交吧666");
-            Console.WriteLine("Hello World!");
+            while (true)
+            {
+                var time = DateTime.Now;
+                Console.WriteLine($"{DateTimeHelper.ConvertToLong(time)} = {time:yyyy-MM-dd HH:mm:ss ffff}");
+                Thread.Sleep(1000);
+            }
+
+            var timestamp = 1567868724201;
+            var dt = DateTimeHelper.ConvertToDateTime(timestamp);
+            Console.WriteLine(dt.ToString("yyyy-MM-dd HH:mm:ss "));
+
+            Console.Read();
         }
     }
 }

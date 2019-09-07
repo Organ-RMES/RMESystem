@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using RMES.EF;
 using RMES.Framework;
 using RMES.Portal.WebApi.Extensions;
 using RMES.Services.Bbs;
