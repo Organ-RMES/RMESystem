@@ -3,7 +3,10 @@ using RMES.EF;
 using RMES.Entity;
 using RMES.Framework;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
 
 namespace RMES.Services.Bbs
 {
@@ -13,10 +16,12 @@ namespace RMES.Services.Bbs
     public class PostService
     {
         private readonly RmesContext _context;
+        private readonly IMapper _mapper;
 
-        public PostService(RmesContext context)
+        public PostService(RmesContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         /// <summary>
@@ -256,6 +261,48 @@ namespace RMES.Services.Bbs
 
             var result = await _context.SaveChangesAsync();
             return result > 0 ? ResultUtil.Ok() : ResultUtil.DbFail();
+        }
+
+        /// <summary>
+        /// 获取帖子的回复
+        /// </summary>
+        /// <param name="postIds">帖子ID列表</param>
+        /// <returns></returns>
+        public async Task<List<ReplyView>> GetReplies(int[] postIds)
+        {
+            if (postIds == null || !postIds.Any())
+            {
+                return new List<ReplyView>();
+            }
+
+            var replies = await _context.Replies
+                            .Include(r => r.Creator)
+                            .Include(r => r.TargetUser)
+                            .Where(r => postIds.Contains(r.Id))
+                            .OrderByDescending(r => r.CreateAt)
+                            .ToListAsync();
+            return _mapper.Map<List<ReplyView>>(replies);
+        }
+
+        /// <summary>
+        /// 获取主题的所有回复
+        /// </summary>
+        /// <param name="topicId"></param>
+        /// <returns></returns>
+        public async Task<List<ReplyView>> GetRepliesByTopicId(int topicId)
+        {
+            if (topicId <= 0)
+            {
+                return new List<ReplyView>();
+            }
+
+            var replies = await _context.Replies
+                .Include(r => r.Creator)
+                .Include(r => r.TargetUser)
+                .Where(r => r.TopicId == topicId)
+                .OrderByDescending(r => r.CreateAt)
+                .ToListAsync();
+            return _mapper.Map<List<ReplyView>>(replies);
         }
     }
 }

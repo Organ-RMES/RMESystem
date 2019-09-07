@@ -13,6 +13,11 @@ namespace RMES.Services.Bbs
         public int Id { get; set; }
 
         /// <summary>
+        /// 主题标题
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
         /// 回帖数量
         /// </summary>
         public int CommentCount { get; set; }
@@ -30,7 +35,7 @@ namespace RMES.Services.Bbs
         /// <summary>
         /// 最后一次更新时间
         /// </summary>
-        public DateTime UpdateAt { get; set; }
+        public string UpdateAt { get; set; }
 
         /// <summary>
         /// 作者的昵称
@@ -45,6 +50,6 @@ namespace RMES.Services.Bbs
         /// <summary>
         /// 最后一次回帖时间
         /// </summary>
-        public DateTime? LastCommentAt { get; set; }
+        public string LastCommentAt { get; set; }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace RMES.Entity
 {
@@ -38,5 +39,17 @@ namespace RMES.Entity
         /// 创建时间
         /// </summary>
         public DateTime CreateAt { get; set; } = DateTime.Now;
+
+        /// <summary>
+        /// 创建人
+        /// </summary>
+        [ForeignKey("CreateBy")]
+        public User Creator { get; set; }
+
+        /// <summary>
+        /// 回复对象
+        /// </summary>
+        [ForeignKey("TargetUserId")]
+        public User TargetUser { get; set; }
     }
 }

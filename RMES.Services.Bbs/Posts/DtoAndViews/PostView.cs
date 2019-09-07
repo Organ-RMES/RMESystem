@@ -45,7 +45,7 @@ namespace RMES.Services.Bbs
         /// <summary>
         /// 最后一次更新时间
         /// </summary>
-        public DateTime UpdateAt { get; set; }
+        public string UpdateAt { get; set; }
 
         /// <summary>
         /// 作者ID

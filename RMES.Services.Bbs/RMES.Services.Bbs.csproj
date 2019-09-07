@@ -5,6 +5,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\RMES.EF\RMES.EF.csproj" />
     <ProjectReference Include="..\RMES.Entity\RMES.Entity.csproj" />
     <ProjectReference Include="..\RMES.Framework\RMES.Framework.csproj" />

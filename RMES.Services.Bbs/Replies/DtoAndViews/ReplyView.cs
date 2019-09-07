@@ -40,6 +40,6 @@ namespace RMES.Services.Bbs
         /// <summary>
         /// 回复的时间
         /// </summary>
-        public DateTime CreateAt { get; set; }
+        public string CreateAt { get; set; }
     }
 }

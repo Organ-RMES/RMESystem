@@ -6,6 +6,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using AutoMapper;
+using RMES.Services.Common;
 
 namespace RMES.Services.Bbs
 {
@@ -15,10 +17,12 @@ namespace RMES.Services.Bbs
     public class TopicService
     {
         private readonly RmesContext _context;
+        private readonly IMapper _mapper;
 
-        public TopicService(RmesContext context)
+        public TopicService(RmesContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
 
         #region 新帖
@@ -91,31 +95,26 @@ namespace RMES.Services.Bbs
             var posts = await _context.Posts.Include(p => p.Creator)
                                 .Where(p => p.TopicId == id)
                                 .OrderByDescending(p => p.IsMaster).ThenByDescending(p => p.UpdateAt)
-                                .Select(p => new PostView
-                                {
-                                    Id = p.Id,
-                                    IsMaster = p.IsMaster,
-                                    Contents = p.Contents,
-                                    IsAccept = p.IsAccept,
-                                    ReplyCount = p.ReplyCount,
-                                    LikeCount = p.LikeCount,
-                                    DislikeCount = p.DislikeCount,
-                                    UpdateAt = p.UpdateAt,
-                                    CreateBy = p.CreateBy,
-                                    Author = p.Creator.NickName,
-                                    AuthorGrade = p.Creator.Grade,
-                                    AuthorAvatar = p.Creator.Avatar
-                                })
                                 .ToListAsync();
 
             var view = new TopicDetailsView
             {
                 Id = topic.Id,
                 Title = topic.Title,
-                Posts = posts
+                Posts = _mapper.Map<List<PostView>>(posts)
             };
             return ResultUtil.Ok(view);
         }
+
+        public async Task<List<TopicListView>> GetListView(TopicSearchInput input, int pageIndex = 1, int pageSize = 20)
+        {
+            var query = _context.Topics.Include(t => t.Creator);
+            var where = input?.ToExpression() ?? LinqExtensions.True<Topic>();
+            var source = await query.Where(where).OrderByDescending(t => t.UpdateAt).Skip((pageIndex - 1) * pageSize).Take(pageSize)
+                .ToListAsync();
+            return _mapper.Map<List<TopicListView>>(source);
+        }
+
         #endregion
 
         #region 收藏

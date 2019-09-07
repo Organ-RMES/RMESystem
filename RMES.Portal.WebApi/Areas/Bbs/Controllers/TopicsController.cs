@@ -19,10 +19,10 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
 
         private readonly AppUser _user = new AppUser { Id = 1, NickName = "会飞的猪" };
 
-        public TopicsController(RmesContext context)
+        public TopicsController(RmesContext context, TopicService service)
         {
             _context = context;
-            _topicService = new TopicService(context);
+            _topicService = service;
         }
 
         /// <summary>
@@ -30,14 +30,12 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Topic>>> GetTopics([FromQuery]TopicSearchInput input, int pageIndex, int pageSize = 20)
+        public async Task<ActionResult<List<TopicListView>>> GetTopics([FromQuery]TopicSearchInput input, int pageIndex, int pageSize = 20)
         {
             pageIndex = pageIndex < 1 ? 1 : pageIndex;
             pageSize = pageSize < 5 ? 5 : pageSize;
 
-            var where = input.ToExpression();
-
-            return await _context.Topics.Where(where).Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return await _topicService.GetListView(input, pageIndex, pageSize);
         }
 
         /// <summary>

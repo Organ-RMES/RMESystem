@@ -18,6 +18,8 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using AutoMapper;
+using RMES.Services.Bbs;
 
 namespace RMES.Portal.WebApi
 {
@@ -32,7 +34,7 @@ namespace RMES.Portal.WebApi
 
         public void ConfigureServices(IServiceCollection services)
         {
-            // 使用Autofac创建Conroller
+            // 使用AutoFac创建Controller
             services.Replace(ServiceDescriptor.Transient<IControllerActivator, ServiceBasedControllerActivator>());
 
             // 注册Swagger
@@ -43,6 +45,11 @@ namespace RMES.Portal.WebApi
                 var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
                 c.IncludeXmlComments(xmlPath);
             });
+
+            // 注册AutoMapper
+            services.AddAutoMapper(typeof(BbsAutoMapperProfile).Assembly);
+            services.AddTransient<TopicService>();
+            services.AddTransient<PostService>();
 
             services.AddDbContext<RmesContext>(options =>
             {

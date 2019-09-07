@@ -15,9 +15,9 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         private readonly PostService _service;
         private readonly AppUser _user = new AppUser { Id = 1, NickName = "会飞的猪" };
 
-        public PostsController(RmesContext context)
+        public PostsController(PostService service)
         {
-            _service = new PostService(context);
+            _service = service;
         }
 
         /// <summary>
