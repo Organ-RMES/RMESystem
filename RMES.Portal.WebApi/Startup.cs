@@ -19,6 +19,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using AutoMapper;
+using Microsoft.AspNetCore.Http;
 using RMES.Portal.WebApi.Extensions.Authorizations;
 using RMES.Services.Bbs;
 
@@ -53,6 +54,8 @@ namespace RMES.Portal.WebApi
             // 注册自定义Service
             services.AddTransient<TopicService>();
             services.AddTransient<PostService>();
+            services.AddTransient<ReplyService>();
+            services.AddTransient<UserService>();
 
             // 注册JWT
             services.AddJwtConfiguration(Configuration);
@@ -60,10 +63,20 @@ namespace RMES.Portal.WebApi
             // 注册缓存
             services.AddDistributedMemoryCache();
 
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
             services.AddDbContext<RmesContext>(options =>
             {
                 options.UseSqlServer(Configuration.GetConnectionString("DefaultConnectionString"));
                 options.EnableSensitiveDataLogging(true);
+            });
+
+            services.AddCors(options =>
+            {
+                options.AddPolicy("AllowAll", builder =>
+                    {
+                        builder.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin();
+                    });
             });
 
             services.AddControllers(options => 
@@ -109,6 +122,8 @@ namespace RMES.Portal.WebApi
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "RMES Portal V1");
                 c.RoutePrefix = string.Empty; // 不使用Swagger前缀
             });
+
+            app.UseCors("AllowAll");
 
             app.UseEndpoints(endpoints =>
             {

@@ -31,6 +31,11 @@ namespace RMES.Entity
         public string Contents { get; set; }
 
         /// <summary>
+        /// 是否删除
+        /// </summary>
+        public bool IsDel { get; set; }
+
+        /// <summary>
         /// 创建人ID
         /// </summary>
         public int CreateBy { get; set; }
@@ -51,5 +56,7 @@ namespace RMES.Entity
         /// </summary>
         [ForeignKey("TargetUserId")]
         public User TargetUser { get; set; }
+
+        public Post Post { get; set; }
     }
 }

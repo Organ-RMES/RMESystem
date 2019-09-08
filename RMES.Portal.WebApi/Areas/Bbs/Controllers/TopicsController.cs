@@ -1,13 +1,13 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using RMES.EF;
 using RMES.Entity;
 using RMES.Framework;
 using RMES.Portal.WebApi.Extensions;
 using RMES.Services.Bbs;
+using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
 {
@@ -30,12 +30,25 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         /// </summary>
         /// <returns></returns>
         [HttpGet]
-        public async Task<ActionResult<List<TopicListView>>> GetTopics([FromQuery]TopicSearchInput input, int pageIndex, int pageSize = 20)
+        public async Task<Result<List<TopicListView>>> GetTopics([FromQuery]TopicSearchInput input, int pageIndex, int pageSize = 20)
         {
             pageIndex = pageIndex < 1 ? 1 : pageIndex;
             pageSize = pageSize < 5 ? 5 : pageSize;
 
             return await _topicService.GetListView(input, pageIndex, pageSize);
+        }
+
+        /// <summary>
+        /// 获取主题列表，包含分页信息
+        /// </summary>
+        /// <returns></returns>
+        [HttpGet("Get")]
+        public async Task<PageListResult<TopicListView>> GetPagedTopics([FromQuery]TopicSearchInput input, int pageIndex, int pageSize = 20)
+        {
+            pageIndex = pageIndex < 1 ? 1 : pageIndex;
+            pageSize = pageSize < 5 ? 5 : pageSize;
+
+            return await _topicService.GetPageListView(input, pageIndex, pageSize);
         }
 
         /// <summary>
@@ -56,38 +69,40 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         /// <param name="id"></param>
         /// <param name="topic"></param>
         /// <returns></returns>
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutTopic(int id, Topic topic)
+        [HttpPost("Edit/{id}")]
+        public async Task<Result> PutTopic(int id, TopicEditDto topic)
         {
             if (id != topic.Id)
             {
-                return BadRequest();
+                return ResultUtil.BadRequest();
             }
 
-            _context.Entry(topic).State = EntityState.Modified;
-
-            try
+            if (string.IsNullOrWhiteSpace(topic.Title))
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!TopicExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
+                return ResultUtil.BadRequest("主题标题不能为空");
             }
 
-            return NoContent();
+            var origin = await _context.FindAsync<Topic>(id);
+            if (origin == null)
+            {
+                return ResultUtil.BadRequest("主题不存在或已删除");
+            }
+            if (origin.CreateBy != _user.Id)
+            {
+                return ResultUtil.BadRequest("无权编辑此主题");
+            }
+
+            origin.Title = topic.Title;
+            origin.UpdateAt = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+            return ResultUtil.Ok();
         }
 
         /// <summary>
         /// 发布主题
         /// </summary>
+        /// <param name="accessor"></param>
         /// <param name="topic"></param>
         /// <returns></returns>
         [HttpPost]
@@ -109,7 +124,8 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
 
                 return ResultUtil.BadRequest(string.Join(";", errors));
             }
-            var result = await _topicService.Create(topic, _user);
+            var host = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Path}";
+            var result = await _topicService.Create(topic, _user, host);
             return result;
         }
 
@@ -118,15 +134,10 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         /// </summary>
         /// <param name="id">主题ID</param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<Result> DeleteTopic(int id)
         {
             return await _topicService.Delete(id, _user);
-        }
-
-        private bool TopicExists(int id)
-        {
-            return _context.Topics.Any(e => e.Id == id);
         }
     }
 }

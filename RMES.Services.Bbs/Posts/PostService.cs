@@ -96,6 +96,10 @@ namespace RMES.Services.Bbs
 
             // 用户回帖数量减1
             post.Creator.CommentCount -= 1;
+
+            var history = HistoryFactory.DeleteComment(post.TopicId, post.Topic.Title, post.CreateBy);
+            _context.Add(history);
+
             var result = await _context.SaveChangesAsync();
             return result > 0 ? ResultUtil.Ok() : ResultUtil.DbFail();
         }
@@ -278,7 +282,7 @@ namespace RMES.Services.Bbs
             var replies = await _context.Replies
                             .Include(r => r.Creator)
                             .Include(r => r.TargetUser)
-                            .Where(r => postIds.Contains(r.Id))
+                            .Where(r => postIds.Contains(r.PostId))
                             .OrderByDescending(r => r.CreateAt)
                             .ToListAsync();
             return _mapper.Map<List<ReplyView>>(replies);
@@ -303,6 +307,46 @@ namespace RMES.Services.Bbs
                 .OrderByDescending(r => r.CreateAt)
                 .ToListAsync();
             return _mapper.Map<List<ReplyView>>(replies);
+        }
+
+        /// <summary>
+        /// 获取帖子的所有回复
+        /// </summary>
+        /// <param name="postId"></param>
+        /// <returns></returns>
+        public async Task<List<ReplyView>> GetRepliesByPostId(int postId)
+        {
+            if (postId <= 0)
+            {
+                return new List<ReplyView>();
+            }
+
+            var replies = await _context.Replies
+                .Include(r => r.Creator)
+                .Include(r => r.TargetUser)
+                .Where(r => r.PostId == postId)
+                .OrderByDescending(r => r.CreateAt)
+                .ToListAsync();
+            return _mapper.Map<List<ReplyView>>(replies);
+        }
+
+        /// <summary>
+        /// 根据主题ID获取帖子列表
+        /// </summary>
+        /// <param name="topicId"></param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        public async Task<List<PostView>> GetPostsByTopicId(int topicId, int pageIndex = 1, int pageSize = 20)
+        {
+            var query = _context.Posts
+                            .Include(r => r.Creator)
+                            .Where(p => p.TopicId == topicId)
+                            .OrderByDescending(p => p.IsMaster)
+                            .ThenByDescending(p => p.UpdateAt);
+
+            var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            return _mapper.Map<List<PostView>>(data);
         }
     }
 }

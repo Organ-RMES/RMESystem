@@ -1,11 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
+﻿using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Text;
 
 namespace RMES.Portal.WebApi.Extensions.Authorizations
 {
@@ -34,7 +31,7 @@ namespace RMES.Portal.WebApi.Extensions.Authorizations
                         ValidateIssuer = true,
                         ValidIssuer = configuration["Authentication:JwtBearer:Issuer"],
 
-                        // 验证 JWT Audience (aud) 受众 claim
+                        // 验证 JWT Audience (aud) 受众 claim 
                         ValidateAudience = true,
                         ValidAudience = configuration["Authentication:JwtBearer:Audience"],
 

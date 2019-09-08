@@ -26,7 +26,7 @@ namespace RMES.EF
         {
             builder.Entity<Post>().HasQueryFilter(p => p.IsDel == false);
             builder.Entity<Topic>().HasQueryFilter(p => p.IsDel == false);
-            
+            builder.Entity<Reply>().HasQueryFilter(p => p.IsDel == false);
         }
     }
 }

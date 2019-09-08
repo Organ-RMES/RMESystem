@@ -8,6 +8,8 @@ namespace RMES.Services.Bbs
 
         public string Title { get; set; }
 
+        public int CommentCount { get; set; }
+
         public List<PostView> Posts { get; set; }
     }
 }

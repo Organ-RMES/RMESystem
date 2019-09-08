@@ -36,9 +36,19 @@
         public static int Comment => 4;
 
         /// <summary>
+        /// 删除回帖
+        /// </summary>
+        public static int DeleteComment => 14;
+
+        /// <summary>
         /// 回复
         /// </summary>
         public static int Reply => 5;
+
+        /// <summary>
+        /// 删除回复
+        /// </summary>
+        public static int DeleteReply => 13;
 
         /// <summary>
         /// 关注某人

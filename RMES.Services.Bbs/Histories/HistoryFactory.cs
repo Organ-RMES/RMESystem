@@ -77,6 +77,17 @@ namespace RMES.Services.Bbs
             };
         }
 
+        public static History DeleteComment(int topicId, string title, int userId)
+        {
+            return new History
+            {
+                UserId = userId,
+                TopicId = topicId,
+                Contents = title,
+                Type = HistoryTypes.DeleteComment
+            };
+        }
+
         public static History Reply(int topicId, int postId, int targetUserId, string targetUserName, string content, int userId)
         {
             return new History
@@ -87,6 +98,19 @@ namespace RMES.Services.Bbs
                 PostId = postId,
                 Contents = $"回复了 {targetUserName}，内容：{content}",
                 Type = HistoryTypes.Reply
+            };
+        }
+
+        public static History DeleteReply(int topicId, int postId, int targetUserId, string targetUserName, string content, int userId)
+        {
+            return new History
+            {
+                UserId = userId,
+                TopicId = topicId,
+                TargetUserId = targetUserId,
+                PostId = postId,
+                Contents = $"回复了 {targetUserName}，内容：{content}",
+                Type = HistoryTypes.DeleteReply
             };
         }
 

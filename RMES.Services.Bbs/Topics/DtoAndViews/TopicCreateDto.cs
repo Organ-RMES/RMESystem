@@ -26,6 +26,16 @@ namespace RMES.Services.Bbs
         public string Contents { get; set; }
 
         /// <summary>
+        /// 摘要
+        /// </summary>
+        public string Summary { get; set; }
+
+        /// <summary>
+        /// 封面图片
+        /// </summary>
+        public string Pics { get; set; }
+
+        /// <summary>
         /// 主贴类型，normal 普通，qa 问答
         /// </summary>
         public string Type { get; set; } = "normal";

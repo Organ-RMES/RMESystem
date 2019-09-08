@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System.Collections.Generic;
+using Microsoft.AspNetCore.Mvc;
 using RMES.Framework;
 using RMES.Portal.WebApi.Extensions;
 using RMES.Services.Bbs;
@@ -72,10 +73,27 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         /// </summary>
         /// <param name="id">帖子ID</param>
         /// <returns></returns>
-        [HttpDelete("{id}")]
+        [HttpPost("Delete/{id}")]
         public async Task<Result> Delete(int id)
         {
             return await _service.Delete(id, _user);
+        }
+
+        /// <summary>
+        /// 获取主题的帖子
+        /// </summary>
+        /// <param name="id">主题ID</param>
+        /// <param name="pageIndex"></param>
+        /// <param name="pageSize"></param>
+        /// <returns></returns>
+        [HttpGet("{id}")]
+        public async Task<List<PostView>> Get(int id, int pageIndex, int pageSize)
+        {
+            pageIndex = pageIndex < 1 ? 1 : pageIndex;
+            pageSize = pageSize < 5 ? 5 : pageSize;
+
+            var posts = await _service.GetPostsByTopicId(id, pageIndex, pageSize);
+            return posts;
         }
     }
 }

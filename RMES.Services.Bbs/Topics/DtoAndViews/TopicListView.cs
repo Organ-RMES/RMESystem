@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RMES.Services.Bbs
+﻿namespace RMES.Services.Bbs
 {
     /// <summary>
     /// 主题列表视图

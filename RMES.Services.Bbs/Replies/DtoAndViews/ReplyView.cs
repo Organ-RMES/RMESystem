@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace RMES.Services.Bbs
+﻿namespace RMES.Services.Bbs
 {
     /// <summary>
     /// 回复视图
@@ -11,6 +9,16 @@ namespace RMES.Services.Bbs
         /// ID
         /// </summary>
         public int Id { get; set; }
+
+        /// <summary>
+        /// 主题ID
+        /// </summary>
+        public int TopicId { get; set; }
+
+        /// <summary>
+        /// 帖子ID
+        /// </summary>
+        public int PostId { get; set; }
 
         /// <summary>
         /// 创建人

@@ -13,6 +13,13 @@
     <ProjectReference Include="..\RMES.Entity\RMES.Entity.csproj" />
     <ProjectReference Include="..\RMES.Framework\RMES.Framework.csproj" />
     <ProjectReference Include="..\RMES.Services.Common\RMES.Services.Common.csproj" />
+    <ProjectReference Include="..\RMES.Util\RMES.Util.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.AspNetCore.Http.Abstractions">
+      <HintPath>C:\Program Files\dotnet\packs\Microsoft.AspNetCore.App.Ref\3.0.0-preview8.19405.7\ref\netcoreapp3.0\Microsoft.AspNetCore.Http.Abstractions.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Text;
+using RMES.Services.Bbs;
 
 namespace RMES.Portal.WebApi.Controllers
 {
@@ -21,11 +22,13 @@ namespace RMES.Portal.WebApi.Controllers
     {
         private readonly IConfiguration _configuration;
         private readonly IDistributedCache _cache;
+        private readonly UserService _service;
 
-        public AccessTokenController(IConfiguration configuration, IDistributedCache cache)
+        public AccessTokenController(IConfiguration configuration, IDistributedCache cache, UserService service)
         {
             _configuration = configuration;
             _cache = cache;
+            _service = service;
         }
 
         /// <summary>
@@ -36,39 +39,40 @@ namespace RMES.Portal.WebApi.Controllers
         /// <param name="model"></param>
         /// <returns></returns>
         [HttpPost]
-        public IActionResult Post([FromBody]LoginModel model)
+        public ActionResult Post([FromBody]LoginModel model)
         {
-            if (!string.IsNullOrWhiteSpace(model.Account) && !string.IsNullOrWhiteSpace(model.Pw))
+            var result = _service.Login(model.Account, model.Pw);
+            if (result.Code != 200)
             {
-                var user = new SessionUser
-                {
-                    Id = 1,
-                    Name = "admin",
-                    Role = "user"
-                };
-
-                var refreshToken = Guid.NewGuid().ToString("N");
-                var refreshTokenExpiredTime = DateTime.Now.AddMinutes(60);
-
-                var cacheKey = $"RefreshToken:{refreshToken}";
-                var cacheValue = JsonConvert.SerializeObject(user);
-
-                _cache.SetString(cacheKey, cacheValue,
-                    new DistributedCacheEntryOptions
-                    {
-                        AbsoluteExpiration = refreshTokenExpiredTime
-                    });
-
-                return Ok(new
-                {
-                    AccessToken = GetAccessToken(user),
-                    Code = 200,
-                    RefreshTokenExpired = DateTimeHelper.ConvertToLong(refreshTokenExpiredTime),
-                    RefreshToken = refreshToken
-                });
+                return Ok(new {Code = 0, Message = result.Message});
             }
 
-            return Ok(new { Code = 0, Token = "" });
+            var user = new SessionUser
+            {
+                Id = result.Body.Id,
+                Name = result.Body.NickName,
+                Role = "user"
+            };
+
+            var refreshToken = Guid.NewGuid().ToString("N");
+            var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
+
+            var cacheKey = $"RefreshToken:{refreshToken}";
+            var cacheValue = JsonConvert.SerializeObject(user);
+
+            _cache.SetString(cacheKey, cacheValue,
+                new DistributedCacheEntryOptions
+                {
+                    AbsoluteExpiration = refreshTokenExpiredTime
+                });
+
+            return Ok(new
+            {
+                AccessToken = GetAccessToken(user),
+                Code = 200,
+                RefreshTokenExpired = DateTimeHelper.ConvertToLong(refreshTokenExpiredTime),
+                RefreshToken = refreshToken
+            });
         }
 
         /// <summary>
@@ -105,11 +109,11 @@ namespace RMES.Portal.WebApi.Controllers
 
             var refreshToken = Guid.NewGuid().ToString("N");
             var cacheKey = $"RefreshToken:{refreshToken}";
-            var refreshTokenExpiredTime = DateTime.Now.AddMinutes(60);
+            var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
 
             _cache.SetString(cacheKey, cacheStr, new DistributedCacheEntryOptions
             {
-                AbsoluteExpiration = DateTime.Now.AddMinutes(30)
+                AbsoluteExpiration = refreshTokenExpiredTime
             });
 
             return Ok(new
@@ -143,7 +147,7 @@ namespace RMES.Portal.WebApi.Controllers
                 _configuration["Authentication:JwtBearer:Issuer"],
                 _configuration["Authentication:JwtBearer:Audience"],
                 claims,
-                expires: DateTime.Now.AddMinutes(30),
+                expires: DateTime.Now.AddHours(2),
                 signingCredentials: credentials
             );
 
