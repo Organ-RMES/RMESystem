@@ -284,6 +284,7 @@ namespace RMES.Services.Bbs
                             .Include(r => r.TargetUser)
                             .Where(r => postIds.Contains(r.PostId))
                             .OrderByDescending(r => r.CreateAt)
+                            .AsNoTracking()
                             .ToListAsync();
             return _mapper.Map<List<ReplyView>>(replies);
         }
@@ -305,6 +306,7 @@ namespace RMES.Services.Bbs
                 .Include(r => r.TargetUser)
                 .Where(r => r.TopicId == topicId)
                 .OrderByDescending(r => r.CreateAt)
+                .AsNoTracking()
                 .ToListAsync();
             return _mapper.Map<List<ReplyView>>(replies);
         }
@@ -326,6 +328,7 @@ namespace RMES.Services.Bbs
                 .Include(r => r.TargetUser)
                 .Where(r => r.PostId == postId)
                 .OrderByDescending(r => r.CreateAt)
+                .AsNoTracking()
                 .ToListAsync();
             return _mapper.Map<List<ReplyView>>(replies);
         }
@@ -345,7 +348,7 @@ namespace RMES.Services.Bbs
                             .OrderByDescending(p => p.IsMaster)
                             .ThenByDescending(p => p.UpdateAt);
 
-            var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).ToListAsync();
+            var data = await query.Skip((pageIndex - 1) * pageSize).Take(pageSize).AsNoTracking().ToListAsync();
             return _mapper.Map<List<PostView>>(data);
         }
     }

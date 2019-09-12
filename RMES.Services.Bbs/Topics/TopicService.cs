@@ -162,6 +162,7 @@ namespace RMES.Services.Bbs
                                 .OrderByDescending(p => p.IsMaster)
                                 .ThenByDescending(p => p.UpdateAt)
                                 .Take(pageSize)
+                                .AsNoTracking()
                                 .ToListAsync();
 
             var view = new TopicDetailsView
@@ -178,8 +179,9 @@ namespace RMES.Services.Bbs
         {
             var query = _context.Topics.Include(t => t.Creator);
             var where = input?.ToExpression() ?? LinqExtensions.True<Topic>();
-            var source = await query.Where(where).OrderByDescending(t => t.UpdateAt).Skip((pageIndex - 1) * pageSize).Take(pageSize)
-                .ToListAsync();
+            var source = await query.Where(where).OrderByDescending(t => t.UpdateAt)
+                .Skip((pageIndex - 1) * pageSize).Take(pageSize)
+                .AsNoTracking().ToListAsync();
             var data = _mapper.Map<List<TopicListView>>(source);
             return ResultUtil.Ok(data);
         }
@@ -193,6 +195,7 @@ namespace RMES.Services.Bbs
             var source = await query.Include(t => t.Creator)
                 .OrderByDescending(t => t.UpdateAt).Skip((pageIndex - 1) * pageSize)
                 .Take(pageSize)
+                .AsNoTracking()
                 .ToListAsync();
             var data = _mapper.Map<List<TopicListView>>(source);
             return ResultUtil.PageList(count, pageIndex, pageSize, data);
