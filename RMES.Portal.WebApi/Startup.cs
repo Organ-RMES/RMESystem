@@ -1,7 +1,9 @@
 using Autofac;
 using Autofac.Extras.DynamicProxy;
+using AutoMapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.EntityFrameworkCore;
@@ -12,16 +14,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using RMES.EF;
+using RMES.Portal.WebApi.Extensions.Authorizations;
 using RMES.Portal.WebApi.Extensions.Filters;
 using RMES.Portal.WebApi.Extensions.Middlewares;
+using RMES.Services.Bbs;
 using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using RMES.Portal.WebApi.Extensions.Authorizations;
-using RMES.Services.Bbs;
 
 namespace RMES.Portal.WebApi
 {
