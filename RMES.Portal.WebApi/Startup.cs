@@ -56,6 +56,7 @@ namespace RMES.Portal.WebApi
             services.AddTransient<PostService>();
             services.AddTransient<ReplyService>();
             services.AddTransient<UserService>();
+            services.AddTransient<BbsUserCenterServices>();
 
             // ×¢²áJWT
             services.AddJwtConfiguration(Configuration);

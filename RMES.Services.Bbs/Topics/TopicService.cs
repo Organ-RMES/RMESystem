@@ -4,13 +4,12 @@ using RMES.EF;
 using RMES.Entity;
 using RMES.Framework;
 using RMES.Services.Common;
+using RMES.Util;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
-using RMES.Util;
 
 namespace RMES.Services.Bbs
 {
@@ -29,11 +28,13 @@ namespace RMES.Services.Bbs
         }
 
         #region 新帖
+
         /// <summary>
         /// 发布主题
         /// </summary>
         /// <param name="topicCreateDto"></param>
         /// <param name="user"></param>
+        /// <param name="host"></param>
         /// <returns></returns>
         public async Task<Result> Create(TopicCreateDto topicCreateDto, AppUser user, string host)
         {
@@ -45,12 +46,7 @@ namespace RMES.Services.Bbs
 
             if (string.IsNullOrWhiteSpace(topicCreateDto.Summary))
             {
-                //var summary = HtmlUtil.StripHtml(topicCreateDto.Contents).Trim()
-                //    .Replace(" ","")
-                //    .Replace("\r\n", "")
-                //    .Replace("\n", "");
-
-                var summary = HtmlUtil.GetContentSummary(topicCreateDto.Contents, 100, true);
+                var summary = HtmlUtil.GetContentSummary(topicCreateDto.Contents, 100);
 
                 if (summary.Length > 100)
                 {
@@ -68,15 +64,14 @@ namespace RMES.Services.Bbs
                     var urlList = new List<string>();
                     foreach (var url in urls.Take(4))
                     {
-                        if (!url.Contains("images/face"))
-                        {
-                            if (!url.StartsWith("http"))
-                            {
-                                urlList.Add(Path.Combine($"{host}", url));
-                            }
+                        if (url.Contains("images/face")) continue;
 
-                            urlList.Add(url);
+                        if (!url.StartsWith("http"))
+                        {
+                            urlList.Add(Path.Combine($"{host}", url));
                         }
+
+                        urlList.Add(url);
                     }
                     topicCreateDto.Pics = string.Join(",", urlList);
                 }
@@ -179,9 +174,11 @@ namespace RMES.Services.Bbs
         {
             var query = _context.Topics.Include(t => t.Creator);
             var where = input?.ToExpression() ?? LinqExtensions.True<Topic>();
-            var source = await query.Where(where).OrderByDescending(t => t.UpdateAt)
-                .Skip((pageIndex - 1) * pageSize).Take(pageSize)
-                .AsNoTracking().ToListAsync();
+            var source = await query.Where(where)
+                    .OrderByDescending(t => t.UpdateAt)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .AsNoTracking().ToListAsync();
             var data = _mapper.Map<List<TopicListView>>(source);
             return ResultUtil.Ok(data);
         }
@@ -193,10 +190,11 @@ namespace RMES.Services.Bbs
             query = query.Where(where);
             var count = await query.CountAsync();
             var source = await query.Include(t => t.Creator)
-                .OrderByDescending(t => t.UpdateAt).Skip((pageIndex - 1) * pageSize)
-                .Take(pageSize)
-                .AsNoTracking()
-                .ToListAsync();
+                    .OrderByDescending(t => t.UpdateAt)
+                    .Skip((pageIndex - 1) * pageSize)
+                    .Take(pageSize)
+                    .AsNoTracking()
+                    .ToListAsync();
             var data = _mapper.Map<List<TopicListView>>(source);
             return ResultUtil.PageList(count, pageIndex, pageSize, data);
         }
@@ -234,7 +232,10 @@ namespace RMES.Services.Bbs
 
         public async Task<Result> RemoveCollect(int id, AppUser user)
         {
-            var collect = await _context.Collects.Include(c => c.Topic).SingleOrDefaultAsync(c => c.UserId == user.Id && c.TopicId == id);
+            var collect = await _context.Collects
+                    .Include(c => c.Topic)
+                    .SingleOrDefaultAsync(c => c.UserId == user.Id && c.TopicId == id);
+
             if (collect != null)
             {
                 collect.Topic.CollectCount--;

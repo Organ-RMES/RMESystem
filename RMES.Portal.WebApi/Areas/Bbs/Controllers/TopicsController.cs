@@ -7,7 +7,6 @@ using RMES.Services.Bbs;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Http;
 
 namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
 {
@@ -102,7 +101,6 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         /// <summary>
         /// 发布主题
         /// </summary>
-        /// <param name="accessor"></param>
         /// <param name="topic"></param>
         /// <returns></returns>
         [HttpPost]
@@ -138,6 +136,28 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
         public async Task<Result> DeleteTopic(int id)
         {
             return await _topicService.Delete(id, _user);
+        }
+
+        /// <summary>
+        /// 收藏主题
+        /// </summary>
+        /// <param name="id">主题Id</param>
+        /// <returns></returns>
+        [HttpPost("{id}/Collect")]
+        public async Task<Result> Collect(int id)
+        {
+            return await _topicService.Collect(id, _user);
+        }
+
+        /// <summary>
+        /// 取消收藏主题
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        [HttpPost("{id}/UnCollect")]
+        public async Task<Result> UnCollect(int id)
+        {
+            return await _topicService.RemoveCollect(id, _user);
         }
     }
 }

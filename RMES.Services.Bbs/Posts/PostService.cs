@@ -125,27 +125,25 @@ namespace RMES.Services.Bbs
 
             if (log != null)
             {
-                // 如果已踩，返回错误提醒
-                if (log.Value == 2)
+                switch (log.Value)
                 {
-                    return ResultUtil.BadRequest("您已将该帖子设为不喜欢，请先取消该状态后再试！");
-                }
-
-                // 如果已赞，修改状态为0（不赞不踩），帖子点赞数减1，并添加取消赞的历史记录
-                // 如果未赞，修改状态为1（赞），帖子点赞数加1，并添加点赞的历史记录
-                if (log.Value == 1)
-                {
-                    log.Value = 0;
-                    post.LikeCount -= 1;
-                    history = HistoryFactory.UndoLike(post.TopicId, post.Id, "", user.Id);
-                    _context.Add(history);
-                }
-                else
-                {
-                    log.Value = 1;
-                    post.LikeCount += 1;
-                    history = HistoryFactory.Like(post.TopicId, post.Id, "", user.Id);
-                    _context.Add(history);
+                    // 如果已踩，返回错误提醒
+                    case 2:
+                        return ResultUtil.BadRequest("您已将该帖子设为不喜欢，请先取消该状态后再试！");
+                    // 如果已赞，修改状态为0（不赞不踩），帖子点赞数减1，并添加取消赞的历史记录
+                    // 如果未赞，修改状态为1（赞），帖子点赞数加1，并添加点赞的历史记录
+                    case 1:
+                        log.Value = 0;
+                        post.LikeCount -= 1;
+                        history = HistoryFactory.UndoLike(post.TopicId, post.Id, "", user.Id);
+                        _context.Add(history);
+                        break;
+                    default:
+                        log.Value = 1;
+                        post.LikeCount += 1;
+                        history = HistoryFactory.Like(post.TopicId, post.Id, "", user.Id);
+                        _context.Add(history);
+                        break;
                 }
             }
             else
