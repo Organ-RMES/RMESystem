@@ -24,6 +24,8 @@ namespace RMES.Portal.WebApi.Controllers
         private readonly IDistributedCache _cache;
         private readonly UserService _service;
 
+        private static readonly object Lock = new object();
+
         public AccessTokenController(IConfiguration configuration, IDistributedCache cache, UserService service)
         {
             _configuration = configuration;
@@ -47,15 +49,21 @@ namespace RMES.Portal.WebApi.Controllers
                 return Ok(new {Code = 0, Message = result.Message});
             }
 
+            var refreshToken = Guid.NewGuid().ToString("N");
+            var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
+
+            var accessTokenExpiredTime = DateTime.Now.AddHours(2);
+
             var user = new SessionUser
             {
                 Id = result.Body.Id,
                 Name = result.Body.NickName,
-                Role = "user"
+                Role = "user",
+                ExpireTime = accessTokenExpiredTime
             };
 
-            var refreshToken = Guid.NewGuid().ToString("N");
-            var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
+            var accessToken = GetAccessToken(user, accessTokenExpiredTime);
+            user.AccessToken = accessToken;
 
             var cacheKey = $"RefreshToken:{refreshToken}";
             var cacheValue = JsonConvert.SerializeObject(user);
@@ -66,11 +74,11 @@ namespace RMES.Portal.WebApi.Controllers
                     AbsoluteExpiration = refreshTokenExpiredTime
                 });
 
-            return Ok(new
+            return Ok(new AccessTokenModel
             {
-                AccessToken = GetAccessToken(user),
+                AccessToken = GetAccessToken(user, accessTokenExpiredTime),
                 Code = 200,
-                RefreshTokenExpired = DateTimeHelper.ConvertToLong(refreshTokenExpiredTime),
+                Expired = DateTimeHelper.ConvertToLong(accessTokenExpiredTime),
                 RefreshToken = refreshToken
             });
         }
@@ -84,6 +92,14 @@ namespace RMES.Portal.WebApi.Controllers
         [HttpPost("Refresh")]
         public IActionResult Refresh(RefreshTokenRequest request)
         {
+            var cacheTempKey = $"OldRefreshToken:{request.Token}";
+            var temp = GetAccessTokenFromOldCache();
+
+            if (temp != null)
+            {
+                return Ok(temp);
+            }
+
             var token = request.Token;
             var cacheStr = _cache.GetString($"RefreshToken:{token}");
             if (string.IsNullOrWhiteSpace(cacheStr))
@@ -96,7 +112,8 @@ namespace RMES.Portal.WebApi.Controllers
             }
 
             var cacheUser = JsonConvert.DeserializeObject<SessionUser>(cacheStr);
-            var userId = User.Claims.First(c => c.Type == JwtClaimTypes.Id);
+            
+            var userId = User.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Id);
 
             if (userId == null || cacheUser.Id.ToString() != userId.Value)
             {
@@ -107,30 +124,79 @@ namespace RMES.Portal.WebApi.Controllers
                 });
             }
 
-            var refreshToken = Guid.NewGuid().ToString("N");
-            var cacheKey = $"RefreshToken:{refreshToken}";
-            var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
-
-            _cache.SetString(cacheKey, cacheStr, new DistributedCacheEntryOptions
+            if (cacheUser.ExpireTime.AddMinutes(-5) > DateTime.Now)
             {
-                AbsoluteExpiration = refreshTokenExpiredTime
-            });
+                return Ok(new AccessTokenModel
+                {
+                    AccessToken = cacheUser.AccessToken,
+                    Code = 200,
+                    Expired = DateTimeHelper.ConvertToLong(cacheUser.ExpireTime),
+                    RefreshToken = request.Token
+                });
+            }
 
-            return Ok(new
+            lock (Lock)
             {
-                AccessToken = GetAccessToken(cacheUser),
-                Code = 200,
-                RefreshTokenExpired = DateTimeHelper.ConvertToLong(refreshTokenExpiredTime),
-                RefreshToken = refreshToken
-            });
+                temp = GetAccessTokenFromOldCache();
+                if (temp != null)
+                {
+                    return Ok(temp);
+                }
+
+                var refreshToken = Guid.NewGuid().ToString("N");
+                var cacheKey = $"RefreshToken:{refreshToken}";
+                var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
+
+
+                var accessTokenExpiredTime = DateTime.Now.AddHours(2);
+                var accessToken = GetAccessToken(cacheUser, accessTokenExpiredTime);
+
+                cacheUser.ExpireTime = accessTokenExpiredTime;
+                cacheUser.AccessToken = accessToken;
+
+                _cache.SetString(cacheKey, JsonConvert.SerializeObject(cacheUser), 
+                    new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpiration = refreshTokenExpiredTime
+                    });
+
+                var result = new AccessTokenModel
+                {
+                    AccessToken = accessToken,
+                    Code = 200,
+                    Expired = DateTimeHelper.ConvertToLong(accessTokenExpiredTime),
+                    RefreshToken = refreshToken
+                };
+
+                _cache.SetString(cacheTempKey, JsonConvert.SerializeObject(result), 
+                    new DistributedCacheEntryOptions
+                    {
+                        AbsoluteExpiration = DateTime.Now.AddSeconds(10)
+                    });
+
+                _cache.Remove($"RefreshToken:{request.Token}");
+
+                return Ok(result);
+            }
+
+            // 内部函数，从
+            AccessTokenModel GetAccessTokenFromOldCache()
+            {
+                var tempValue = _cache.GetString(cacheTempKey);
+
+                return !string.IsNullOrWhiteSpace(tempValue) ?
+                    JsonConvert.DeserializeObject<AccessTokenModel>(tempValue) :
+                    null;
+            }
         }
 
         /// <summary>
         /// 通过SessionUser获取AccessToken
         /// </summary>
         /// <param name="user"></param>
+        /// <param name="accessTokenExpiredTime">AccessToken过期时间</param>
         /// <returns></returns>
-        private string GetAccessToken(SessionUser user)
+        private string GetAccessToken(SessionUser user, DateTime accessTokenExpiredTime)
         {
             var claims = new[]
             {
@@ -147,7 +213,7 @@ namespace RMES.Portal.WebApi.Controllers
                 _configuration["Authentication:JwtBearer:Issuer"],
                 _configuration["Authentication:JwtBearer:Audience"],
                 claims,
-                expires: DateTime.Now.AddHours(2),
+                expires: accessTokenExpiredTime,
                 signingCredentials: credentials
             );
 
@@ -163,6 +229,17 @@ namespace RMES.Portal.WebApi.Controllers
             /// RefreshToken，登录后获取
             /// </summary>
             public string Token { get; set; }
+        }
+
+        public class AccessTokenModel
+        {
+            public int Code { get; set; }
+
+            public string AccessToken { get; set; }
+
+            public string RefreshToken { get; set; }
+
+            public long Expired { get; set; }
         }
     }
 }

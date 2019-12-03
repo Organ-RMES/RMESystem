@@ -11,25 +11,25 @@
 
   <ItemGroup>
     <PackageReference Include="Autofac" Version="4.9.4" />
-    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0-rc1" />
+    <PackageReference Include="Autofac.Extensions.DependencyInjection" Version="5.0.0" />
     <PackageReference Include="Autofac.Extras.DynamicProxy" Version="4.5.0" />
     <PackageReference Include="AutoMapper" Version="9.0.0" />
     <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="IdentityModel" Version="4.0.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0-preview9.19424.4" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0-preview9.19423.6" />
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0-preview9.19423.6">
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.0.0" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="3.0.0">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.0.0-preview9.19423.4" />
-    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0-preview9.19423.4" />
-    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0-rc1-19462-10" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="3.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="3.0.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="3.0.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="3.0.1-dev-00099" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.1-dev-00209" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00823" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="3.1.2-dev-00824" />
     <PackageReference Include="Serilog.Sinks.RollingFile" Version="3.3.1-dev-00771" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc2" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="5.0.0-rc3" />
   </ItemGroup>
 
   <ItemGroup>
@@ -41,6 +41,15 @@
   <ItemGroup>
     <ProjectReference Include="..\RMES.Services.Bbs\RMES.Services.Bbs.csproj" />
     <ProjectReference Include="..\RMES.Util\RMES.Util.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="_Illegal\IllegalKeywords.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="_Illegal\IllegalUrls.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

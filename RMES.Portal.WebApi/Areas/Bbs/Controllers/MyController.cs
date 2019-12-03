@@ -22,6 +22,11 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             _mapper = mapper;
         }
 
+        /// <summary>
+        /// 我收藏的主题
+        /// </summary>
+        /// <param name="id">页码</param>
+        /// <returns></returns>
         [HttpGet]
         [Route("Collects/{id}")]
         public PageListResult<MyCollectListView> MyCollects(int id)
@@ -30,6 +35,11 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return _service.MyCollects(_user.Id, id, 20);
         }
 
+        /// <summary>
+        /// 我的回复帖子
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("Posts/{id}")]
         public async Task<PageListResult<Post>> MyPosts(int id)
@@ -38,6 +48,11 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return await _service.MyPosts(_user.Id, id, 20);
         }
 
+        /// <summary>
+        /// 我发布的主题
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("Topics/{id}")]
         public async Task<PageListResult<TopicListView>> MyTopics(int id)
@@ -46,6 +61,11 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return await _service.MyTopics(_user.Id, id, 20);
         }
 
+        /// <summary>
+        /// 我的回复
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("Replies/{id}")]
         public PageListResult<ReplyView> MyReplies(int id)
@@ -54,6 +74,11 @@ namespace RMES.Portal.WebApi.Areas.Bbs.Controllers
             return _service.MyReplies(_user.Id, id, 20);
         }
 
+        /// <summary>
+        /// 回复我的
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet]
         [Route("ReplyMe/{id}")]
         public PageListResult<ReplyView> ReplyMe(int id)

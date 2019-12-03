@@ -18,6 +18,7 @@ namespace RMES.Portal.WebApi
                 {
                     webBuilder.UseStartup<Startup>();
                     webBuilder.UseUrls("http://localhost:5050");
+                    webBuilder.UseSetting("abc", "Õâ¸öÊÇabc");
                 })
                 .UseSerilog((hostBuilderContext, loggerConfiguration) => {
                     loggerConfiguration

@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using RMES.Services.Bbs;
 
 namespace RMES.Portal.WebApi.Controllers
 {
@@ -11,6 +12,13 @@ namespace RMES.Portal.WebApi.Controllers
     [ApiController]
     public class ValuesController : ControllerBase
     {
+        public TopicService Service { get; set; }
+
+        public ValuesController()
+        {
+            Console.WriteLine("注册");
+        }
+
         /// <summary>
         /// 测试的方法
         /// </summary>

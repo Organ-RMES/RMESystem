@@ -110,6 +110,22 @@ namespace RMES.Services.Bbs
         }
         #endregion
 
+        #region 更新
+
+        public async Task<Result> Update(int topicId, string title)
+        {
+            var topic = await Load(topicId);
+            if (topic == null)
+            {
+                return ResultUtil.NotFound();
+            }
+
+            topic.Title = title;
+            _context.SaveChanges();
+            return ResultUtil.Ok();
+        }
+        #endregion
+
         #region 删帖
         /// <summary>
         /// 删除主题
@@ -168,6 +184,11 @@ namespace RMES.Services.Bbs
                 Posts = _mapper.Map<List<PostView>>(posts)
             };
             return ResultUtil.Ok(view);
+        }
+
+        public async Task<Topic> Load(int id)
+        {
+            return await _context.Topics.FindAsync(id);
         }
 
         public async Task<Result<List<TopicListView>>> GetListView(TopicSearchInput input, int pageIndex = 1, int pageSize = 20)

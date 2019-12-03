@@ -22,11 +22,15 @@ namespace RMES.Test
             }
 
             {
-                var pw = "123456";
-                var salt = RandomUtil.GetStringFromFullChars(6);
+                //var pw = "123456";
+                //var salt = RandomUtil.GetStringFromFullChars(6);
 
-                var encryptPw = Md5EncryptUtil.Encrypt(pw, salt);
-                Console.WriteLine($"salt:{salt} pw:{encryptPw}");
+                //var encryptPw = Md5EncryptUtil.Encrypt(pw, salt);
+                //Console.WriteLine($"salt:{salt} pw:{encryptPw}");
+
+                var word = "习近平强调，虽然焦裕禄离开我们50年了";
+                var result = IllegalWordsVerify.FindAll(word);
+                Console.WriteLine("OK");
             }
 
             Console.Read();

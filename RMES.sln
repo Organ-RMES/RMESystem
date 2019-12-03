@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29215.179
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMES.WabApi", "RMES.WabApi\RMES.WabApi.csproj", "{550E3DE1-18E2-440E-8E41-086B408910FE}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "1 基础工具层", "1 基础工具层", "{19E6760D-5BF6-446A-8E07-85B95D5F6582}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "2 数据实体层", "2 数据实体层", "{89B97EB9-A69F-43DF-A0EC-D4CE0F1461AA}"
@@ -33,11 +31,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMES.Test", "RMES.Test\RMES
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMES.Portal.WebApi", "RMES.Portal.WebApi\RMES.Portal.WebApi.csproj", "{8A14C3CF-630F-4D2D-AEB3-1050F590959E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RMES.Services.Common", "RMES.Services.Common\RMES.Services.Common.csproj", "{03271852-6371-4E23-B96C-EC8DB0271D12}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMES.Services.Common", "RMES.Services.Common\RMES.Services.Common.csproj", "{03271852-6371-4E23-B96C-EC8DB0271D12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RMES.Services.Bbs", "RMES.Services.Bbs\RMES.Services.Bbs.csproj", "{514B10E2-C6BB-4102-87C6-2B27C1793077}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMES.Services.Bbs", "RMES.Services.Bbs\RMES.Services.Bbs.csproj", "{514B10E2-C6BB-4102-87C6-2B27C1793077}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RMES.Framework", "RMES.Framework\RMES.Framework.csproj", "{6277C758-3DEB-4204-859E-B447DA2BDBF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RMES.Framework", "RMES.Framework\RMES.Framework.csproj", "{6277C758-3DEB-4204-859E-B447DA2BDBF2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -45,10 +43,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{550E3DE1-18E2-440E-8E41-086B408910FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{550E3DE1-18E2-440E-8E41-086B408910FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{550E3DE1-18E2-440E-8E41-086B408910FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{550E3DE1-18E2-440E-8E41-086B408910FE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{91302D00-79F2-40B0-957F-3DD55E2BD211}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{91302D00-79F2-40B0-957F-3DD55E2BD211}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{91302D00-79F2-40B0-957F-3DD55E2BD211}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -86,7 +80,6 @@ Global
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{550E3DE1-18E2-440E-8E41-086B408910FE} = {A7C95B6C-C38E-4340-8017-CF5C16DA6E27}
 		{46DB4BE7-92E5-46F1-BFF9-B3ABC4B55E2D} = {19E6760D-5BF6-446A-8E07-85B95D5F6582}
 		{066241B4-F27C-494C-BE52-7CBF4D4A76BC} = {19E6760D-5BF6-446A-8E07-85B95D5F6582}
 		{8F6D71D5-6898-4F75-BDED-C4D006EC34DC} = {19E6760D-5BF6-446A-8E07-85B95D5F6582}

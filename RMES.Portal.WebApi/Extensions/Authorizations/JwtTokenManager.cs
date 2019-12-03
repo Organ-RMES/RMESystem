@@ -98,4 +98,18 @@ namespace RMES.Portal.WebApi.Extensions.Authorizations
 
         public List<Claim> Claims { get; set; }
     }
+
+    public class AccessTokenCacheEntry
+    {
+        public string AccessToken { get; set; }
+
+        public DateTime ExpireTime { get; set; }
+
+        public string Sign { get; set; }
+    }
+
+    public class SessionUserCacheEntry
+    {
+        public string Sign { get; set; }
+    }
 }

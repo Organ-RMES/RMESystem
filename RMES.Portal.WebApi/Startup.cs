@@ -84,6 +84,8 @@ namespace RMES.Portal.WebApi
             {
                 options.Filters.Add<MvcExceptionFilter>();
             });
+
+            Console.WriteLine(Configuration["abc"]);
         }
 
         public void ConfigureContainer(ContainerBuilder builder)
