@@ -92,16 +92,21 @@ namespace RMES.Portal.WebApi.Controllers
         [HttpPost("Refresh")]
         public IActionResult Refresh(RefreshTokenRequest request)
         {
+            // 如果暂存缓存中存在当前请求的Token，直接返回；
+            // 这里有个问题，没有进行用户ID的对比
             var cacheTempKey = $"OldRefreshToken:{request.Token}";
-            var temp = GetAccessTokenFromOldCache();
 
+            var temp = GetAccessTokenFromOldCache();
             if (temp != null)
             {
                 return Ok(temp);
             }
 
+            // 从RefreshToken缓存中尝试获取当前请求传递的Token
             var token = request.Token;
             var cacheStr = _cache.GetString($"RefreshToken:{token}");
+
+            // 如果缓存不存在，直接返回
             if (string.IsNullOrWhiteSpace(cacheStr))
             {
                 return Ok(new
@@ -111,10 +116,13 @@ namespace RMES.Portal.WebApi.Controllers
                 });
             }
 
+            // 反序列化缓存中保存的用户信息
             var cacheUser = JsonConvert.DeserializeObject<SessionUser>(cacheStr);
             
+            // 获取当前请求中的用户ID，用于和缓存中的用户ID比对
             var userId = User.Claims.FirstOrDefault(c => c.Type == JwtClaimTypes.Id);
 
+            // 如果当前请求中的用户ID与缓存中用户信息的ID不符，直接返回
             if (userId == null || cacheUser.Id.ToString() != userId.Value)
             {
                 return Ok(new
@@ -124,6 +132,7 @@ namespace RMES.Portal.WebApi.Controllers
                 });
             }
 
+            // 如果AccessToken 5分钟后不会过期，直接返回现存的AccessToken
             if (cacheUser.ExpireTime.AddMinutes(-5) > DateTime.Now)
             {
                 return Ok(new AccessTokenModel
@@ -135,31 +144,36 @@ namespace RMES.Portal.WebApi.Controllers
                 });
             }
 
+            // 加锁，以免重复刷新
             lock (Lock)
             {
+                // 再次检查暂存缓存，如果存在（说明刚刚刷新成功），直接返回
                 temp = GetAccessTokenFromOldCache();
                 if (temp != null)
                 {
                     return Ok(temp);
                 }
 
+                // 下面开始构造新的AccessToken
                 var refreshToken = Guid.NewGuid().ToString("N");
                 var cacheKey = $"RefreshToken:{refreshToken}";
                 var refreshTokenExpiredTime = DateTime.Today.AddDays(7);
 
-
                 var accessTokenExpiredTime = DateTime.Now.AddHours(2);
                 var accessToken = GetAccessToken(cacheUser, accessTokenExpiredTime);
 
+                // 更新当前用户信息
                 cacheUser.ExpireTime = accessTokenExpiredTime;
                 cacheUser.AccessToken = accessToken;
 
+                // 添加新的RefreshToken缓存
                 _cache.SetString(cacheKey, JsonConvert.SerializeObject(cacheUser), 
                     new DistributedCacheEntryOptions
                     {
                         AbsoluteExpiration = refreshTokenExpiredTime
                     });
 
+                // 构造返回结果
                 var result = new AccessTokenModel
                 {
                     AccessToken = accessToken,
@@ -168,18 +182,20 @@ namespace RMES.Portal.WebApi.Controllers
                     RefreshToken = refreshToken
                 };
 
+                // 把新的AccessToken结果保存到暂存缓存，10秒后过期
                 _cache.SetString(cacheTempKey, JsonConvert.SerializeObject(result), 
                     new DistributedCacheEntryOptions
                     {
                         AbsoluteExpiration = DateTime.Now.AddSeconds(10)
                     });
 
+                // 删除旧的RefreshToken
                 _cache.Remove($"RefreshToken:{request.Token}");
 
                 return Ok(result);
             }
 
-            // 内部函数，从
+            // 内部函数，检查暂存缓存是否存在当前请求的RefreshToken
             AccessTokenModel GetAccessTokenFromOldCache()
             {
                 var tempValue = _cache.GetString(cacheTempKey);
